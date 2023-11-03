@@ -1,0 +1,287 @@
+<><><><><><><><><><>
+>>> ReactProject <<<
+<><><><><><><><><><>
+
+react_frontend
+|
+|---node_modules
+|
+|------public
+|	|
+	|--favicon.ico
+	|--index.html
+	|--manifest.json
+|
+|------src
+	|
+	|---index.js
+	|---index.css
+	|
+	|---components
+		|
+		|---ListEmployeeComponent.js
+	|
+	|---App.js
+	|---App.css
+	|---App.test.js
+|
+|-----package.json
+|-----README.md
+
+
+step13:
+-------
+	Create a "Reactprojects" folder.
+
+step14:
+------
+	Create a react project i.e react_frontend.
+	ex:
+		Reactprojects> npx create-react-app react_frontend	
+
+step15:
+------
+	Now open VSC code editor from Reactproject folder.
+	ex:
+		Reactprojects> code . 
+
+step16:
+------
+	Move/Switch to react_frontend project.
+	ex:
+		Reactprojects> cd  react_frontend
+
+step17:
+-----
+	Run the react application.
+	ex:
+		Reactprojects/react_frontend> npm start 
+
+
+step18:
+-----
+	Open the terminal from VSC code editor.
+	
+
+step19:
+-------
+	Install Bootstrap dependency.
+	ex:	
+		Reactprojects> cd react-frontend
+		
+		Reactprojects/react-frontend> npm install bootstrap
+		
+	Note:
+	------
+		import bootstrap in index.js file.			
+		ex:
+		import '../node_modules/bootstrap/dist/css/bootstrap.css';
+
+step20:
+-------
+	Create a "components" folder inside "src" folder.
+
+step21:
+------
+	Install "ES7 React/Redux/styled-component" extension from VSC editor.
+
+step22:
+------
+	Create a ListEmployeeComponent.js file inside "src/components" folder.
+	using below shortcut.
+	ex:
+		rcc 
+
+	ListEmployeeComponent.js
+	-------------------------
+import React, { Component } from 'react'
+
+export default class ListEmployeeComponent extends Component {
+    constructor(props)
+    {
+        super(props);
+
+        this.state={
+            employees:[]
+        }
+    }
+  render() {
+    return (
+      <div>
+            <h2 className='text-center'>Employee List</h2>
+            <div className='row'>
+                <table className='table  table-striped table-bordered'>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>FirstName</th>
+                            <th>LastName</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.state.employees.map(
+                                employee=>
+                                <tr key={employee.id}>
+                                      <td>{employee.firstName}</td>
+                                      <td>{employee.lastName}</td>
+                                      <td>{employee.email}</td>  
+                                </tr>
+                            )
+                        }
+                    </tbody>
+                </table>
+            </div>        
+      </div>
+    )
+  }
+}
+
+step23:
+-------
+	import "ListEmployeeComponent" inside "App.js" file.
+	ex:
+		
+	import logo from './logo.svg';
+	import './App.css';
+	import ListEmployeeComponent from './components/ListEmployeeComponent'
+	function App() {
+  	return (
+   	 	<div className="container">
+      			<ListEmployeeComponent/>
+    		</div>
+  		);
+	}
+	export default App;
+
+Note:
+------
+	Now connect react with spring boot.
+
+step24:
+-------
+	Install axios to connect react with spring boot.
+	ex:
+		Reactprojects/react-frontend> npm install axios --save
+
+
+step25:
+------
+	Create a EmployeeService.js file inside "src/services" folder.
+
+	EmployeeService.js
+	-----------------
+	import axios from 'axios';
+
+	const EMPLOYEE_API_BASE_URL="http://localhost:9090/api/v1/employees";
+
+	class EmployeeService{
+
+ 	   	getEmployees(){
+        	return axios.get(EMPLOYEE_API_BASE_URL);
+    		}
+	}
+	export default new EmployeeService();
+
+step26:
+-------
+	Add componentDidMount() method inside ListEmployeeComponent.js to call api.
+	ex:
+	ListEmployeeComponent.js
+	------------------------
+	import React, { Component } from 'react'
+	import EmployeeService from '../services/EmployeeService';
+
+	export default class ListEmployeeComponent extends Component {
+    	constructor(props)
+    	{
+        	super(props);
+
+ 	       this.state={
+        	    employees:[]
+        	}
+    	}
+  
+    	componentDidMount(){
+      		  EmployeeService.getEmployees().then((res)=>
+        	{
+            	this.setState({employees:res.data})
+        	})
+   	 }
+
+  	render() {
+    		return (
+      		<div>
+            	<h2 className='text-center'>Employee List</h2>
+            	<div className='row'>
+                	<table className='table  table-striped table-bordered'>
+                    	<thead>
+                        	<tr>
+                            	<th>ID</th>
+                            	<th>FirstName</th>
+                            	<th>LastName</th>
+                            	<th>Email</th>
+                           	 <th>Actions</th>
+                        	</tr>
+                    	</thead>
+                    	<tbody>
+                        	{
+                            	this.state.employees.map(
+                                	employee=>
+                                	<tr key={employee.id}>
+					<td>{employee.id}</td>
+                                      	<td>{employee.firstName}</td>
+                                      	<td>{employee.lastName}</td>
+                                      	<td>{employee.email}</td>  
+                                	</tr>
+                            	)
+                        	}
+                    	</tbody>
+                	</table>
+            	</div>        
+      	</div>
+    	)
+  	}
+	}
+	
+
+step27:
+-----
+	Add @CrossOrigin annotation in a EmployeeController class.
+
+	EmployeeController.java
+	-------------------------
+	package com.ihub.www.controller;
+
+	import java.util.List;
+
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.web.bind.annotation.CrossOrigin;
+	import org.springframework.web.bind.annotation.GetMapping;
+	import org.springframework.web.bind.annotation.RequestMapping;
+	import org.springframework.web.bind.annotation.RestController;
+	import com.ihub.www.model.Employee;
+	import com.ihub.www.service.EmployeeService;
+
+	@CrossOrigin(origins = "http://localhost:3000")
+	@RestController
+	@RequestMapping("/api/v1/")
+	public class EmployeeController 
+	{
+		@Autowired
+		EmployeeService employeeService;
+	
+		@GetMapping("/employees")
+		public List<Employee> getAllEmployees()
+		{
+			return employeeService.getAllEmployees();
+		}
+	}
+
+step28:
+-------
+	Relaunch the spring boot starter project and react project and test the 
+	application.
+
